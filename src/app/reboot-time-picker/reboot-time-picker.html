@@ -1,0 +1,19 @@
+<mat-radio-group [value]="mode" (change)="onModeChange($event.value)">
+    <mat-radio-button value="now">Now</mat-radio-button>
+    <mat-radio-button value="later">Schedule Later</mat-radio-button>
+</mat-radio-group>
+@if(mode==='later'){
+<div class="picker">
+    <mat-form-field appearance="fill">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="picker" [formControl]="dateCtrl">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+        <mat-label>Time</mat-label>
+        <input matInput type="time" [formControl]="timeCtrl">
+    </mat-form-field>
+</div>
+}
