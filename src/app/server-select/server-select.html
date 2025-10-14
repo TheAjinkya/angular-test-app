@@ -1,9 +1,9 @@
 <mat-form-field appearance="fill" class="w-full">
     <mat-label>Select Server</mat-label>
     <mat-select (selectionChange)="onSelect($event.value)">
-        @for(s of servers; track s){
-        <mat-option [value]="s">
-            {{ s.name }} ({{ s.status }})
+        @for(server of servers; track server){
+        <mat-option [value]="server">
+            {{ server.name }} ({{ server.status }})
         </mat-option>
         }
     </mat-select>

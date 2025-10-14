@@ -14,10 +14,10 @@ export class ServerSelect implements OnInit {
   servers: Server[] = [];
   @Output() serverSelected = new EventEmitter<Server>();
 
-  constructor(private svc: ServerService) { }
+  constructor(private serverService: ServerService) { }
 
   ngOnInit() {
-    this.svc.getServers().subscribe(list => (this.servers = list));
+    this.serverService.getServers().subscribe(list => (this.servers = list));
   }
 
   onSelect(server: Server) {

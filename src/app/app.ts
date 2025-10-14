@@ -26,8 +26,8 @@ export class App {
 
   constructor(private reboot: RebootService, private snack: MatSnackBar) { }
 
-  onServer(s: Server) { this.selectedServer = s; }
-  onTime(d: Date) { this.scheduledAt = d; }
+  onServer(serverName: Server) { this.selectedServer = serverName; }
+  onTime(selectedTime: Date) { this.scheduledAt = selectedTime; }
   canSubmit() { return !!this.selectedServer && !!this.scheduledAt; }
 
   schedule() {
