@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -19,7 +19,7 @@ import { MatRadioModule } from '@angular/material/radio';
   templateUrl: './reboot-time-picker.html',
   styleUrl: './reboot-time-picker.scss'
 })
-export class RebootTimePicker {
+export class RebootTimePicker implements OnInit, OnDestroy {
   @Output() timeSelected = new EventEmitter<Date>();
 
   mode: string = '';
@@ -27,6 +27,7 @@ export class RebootTimePicker {
   timeCtrl = new FormControl('00:00');
   minDate = new Date();
   minTime = this.getCurrentTimeString();
+  private timerId?: any;
 
   ngOnInit() {
     this.dateCtrl.valueChanges.subscribe(() => {
@@ -40,13 +41,21 @@ export class RebootTimePicker {
       this.validateTime();
       this.emitIfReady();
     });
+
+    this.timerId = setInterval(() => {
+      this.updateMinTime();
+      this.validateTime();
+      this.emitIfReady();
+    }, 60 * 1000); 
   }
 
   onModeChange(v: 'now' | 'later') {
     this.mode = v;
+    console.log("mode", this.mode)
     if (v === 'now') {
       this.timeSelected.emit(new Date());
     } else {
+      this.timeSelected.emit();
       this.emitIfReady();
     }
   }
@@ -62,7 +71,7 @@ export class RebootTimePicker {
     const dt = new Date(d);
     dt.setHours(h, m, 0);
 
-    if (dt.getTime() < new Date().getTime()) return; // 🚫 prevent past
+    if (dt.getTime() < new Date().getTime()) return;
     this.timeSelected.emit(dt);
   }
 
@@ -107,6 +116,12 @@ export class RebootTimePicker {
       this.timeCtrl.setErrors({ pastTime: true });
     } else {
       this.timeCtrl.setErrors(null);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.timerId) {
+      clearInterval(this.timerId);
     }
   }
 
