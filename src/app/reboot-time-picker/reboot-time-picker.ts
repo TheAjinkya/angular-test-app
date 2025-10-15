@@ -19,7 +19,7 @@ import { MatRadioModule } from '@angular/material/radio';
 })
 export class RebootTimePicker {
   @Output() timeSelected = new EventEmitter<Date>();
-  mode: 'now' | 'later' = 'now';
+  mode: string = '';
   dateCtrl = new FormControl(new Date());
   timeCtrl = new FormControl('00:00');
 
