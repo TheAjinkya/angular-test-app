@@ -2,18 +2,26 @@
     <mat-radio-button value="now">Now</mat-radio-button>
     <mat-radio-button value="later">Schedule Later</mat-radio-button>
 </mat-radio-group>
-@if(mode==='later'){
+@if (mode === 'later') {
 <div class="picker">
+    <!-- Date Picker -->
     <mat-form-field appearance="fill">
         <mat-label>Date</mat-label>
-        <input matInput [matDatepicker]="picker" [formControl]="dateCtrl">
+        <input matInput [matDatepicker]="picker" [formControl]="dateCtrl" [min]="minDate" />
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
+@if (dateCtrl.hasError('pastDate')) {
+<mat-error>Date cannot be in the past</mat-error>
+}
     </mat-form-field>
 
+    <!-- Time Picker -->
     <mat-form-field appearance="fill">
         <mat-label>Time</mat-label>
-        <input matInput type="time" [formControl]="timeCtrl">
+        <input matInput type="time" [formControl]="timeCtrl" [min]="minTime" />
+        @if (timeCtrl.hasError('pastTime')) {
+        <mat-error>Time cannot be in the past</mat-error>
+        }
     </mat-form-field>
 </div>
 }

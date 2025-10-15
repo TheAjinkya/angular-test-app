@@ -8,40 +8,112 @@ import { MatRadioModule } from '@angular/material/radio';
 
 @Component({
   selector: 'app-reboot-time-picker',
-  imports: [ReactiveFormsModule,
+  imports: [
+    ReactiveFormsModule,
     MatRadioModule,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    MatNativeDateModule],
+    MatNativeDateModule
+  ],
   templateUrl: './reboot-time-picker.html',
   styleUrl: './reboot-time-picker.scss'
 })
 export class RebootTimePicker {
   @Output() timeSelected = new EventEmitter<Date>();
+
   mode: string = '';
   dateCtrl = new FormControl(new Date());
   timeCtrl = new FormControl('00:00');
+  minDate = new Date();
+  minTime = this.getCurrentTimeString();
 
   ngOnInit() {
-    this.dateCtrl.valueChanges.subscribe(() => this.emitIfReady());
-    this.timeCtrl.valueChanges.subscribe(() => this.emitIfReady());
+    this.dateCtrl.valueChanges.subscribe(() => {
+      this.updateMinTime();
+      this.validateDate();
+      this.validateTime();
+      this.emitIfReady();
+    });
+
+    this.timeCtrl.valueChanges.subscribe(() => {
+      this.validateTime();
+      this.emitIfReady();
+    });
   }
 
   onModeChange(v: 'now' | 'later') {
     this.mode = v;
-    if (v === 'now') this.timeSelected.emit(new Date());
-    else this.emitIfReady();
+    if (v === 'now') {
+      this.timeSelected.emit(new Date());
+    } else {
+      this.emitIfReady();
+    }
   }
 
   emitIfReady() {
     if (this.mode !== 'later') return;
+
     const d = this.dateCtrl.value;
     const t = this.timeCtrl.value;
-    if (!d || !t) return;
+    if (!d || !t || this.dateCtrl.invalid || this.timeCtrl.invalid) return;
+
     const [h, m] = t.split(':').map(Number);
     const dt = new Date(d);
     dt.setHours(h, m, 0);
+
+    if (dt.getTime() < new Date().getTime()) return; // 🚫 prevent past
     this.timeSelected.emit(dt);
+  }
+
+  updateMinTime() {
+    const selectedDate = this.dateCtrl.value;
+    const today = new Date();
+
+    if (!selectedDate) return;
+
+    const isToday =
+      selectedDate.getDate() === today.getDate() &&
+      selectedDate.getMonth() === today.getMonth() &&
+      selectedDate.getFullYear() === today.getFullYear();
+
+    this.minTime = isToday ? this.getCurrentTimeString() : '00:00';
+  }
+
+  validateDate() {
+    const date = this.dateCtrl.value;
+    if (!date) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (date < today) {
+      this.dateCtrl.setErrors({ pastDate: true });
+    } else {
+      this.dateCtrl.setErrors(null);
+    }
+  }
+
+  validateTime() {
+    const date = this.dateCtrl.value;
+    const time = this.timeCtrl.value;
+    if (!date || !time) return;
+
+    const [h, m] = time.split(':').map(Number);
+    const dt = new Date(date);
+    dt.setHours(h, m, 0);
+
+    if (dt < new Date()) {
+      this.timeCtrl.setErrors({ pastTime: true });
+    } else {
+      this.timeCtrl.setErrors(null);
+    }
+  }
+
+  private getCurrentTimeString(): string {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    return `${h}:${m}`;
   }
 }

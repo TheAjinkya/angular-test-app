@@ -1,9 +1,10 @@
 .picker {
     display: flex;
-    gap: 16px;
-    margin-top: 8px;
+    flex-direction: column;
+        gap: 1rem;
+        max-width: 300px;
 }
 
-mat-form-field {
-    flex: 1;
+button[mat-raised-button] {
+    align-self: flex-start;
 }
